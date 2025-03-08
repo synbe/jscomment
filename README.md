@@ -1,6 +1,6 @@
 # 一个基于HTML-CSS-JS的静态评论系统
 
-这个文件是一个基于HTML、CSS和JavaScript的静态评论系统，主要用于创建、编辑、管理和导出JSON格式的评论数据。
+这是一个基于HTML、CSS和JavaScript的静态评论系统，主要用于创建、编辑、管理和导出JSON格式的评论数据。
 
 1. 评论展示界面
 
