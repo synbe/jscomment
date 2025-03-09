@@ -40,7 +40,7 @@
             border: none;
             border-radius: 3px;
             cursor: pointer;
-            width: 8em;
+            width: 6em;
             margin-right: 5px;
         }
 
@@ -59,21 +59,20 @@
             padding-top: 10px;
         }
 
-        #content,
+        #content,#contentcode,
         #contentpreview {
             width: 99%;
             height: 10em;
             padding: 5px;
             overflow-y: auto;
-        }
-
-        #contentcode {
-            width: 99%;
-            height: 5em;
-            padding: 5px;
             color: #4e0d0d;
             font-family: Roboto Mono, Consolas, Monaco, Andale Mono, Ubuntu Mono, monospace;
-            font-size: 0.9em;
+            height: 10em;
+            border: gray 1px solid;
+            border-radius: 5px;
+        }
+        #contentpreview{
+            height: 8.5em;
         }
 
         .content img {
@@ -614,6 +613,11 @@
         .copy-pre-btn:hover {
             transform: scale(1.05);
         }
+
+        .tab-nav button.selected {
+            background-color: gray;
+            color: white;
+        }
     </style>
     <style id="svg-icon">
         .icon {
@@ -948,12 +952,6 @@
         <div id='commentsArea' class="commentsarea"></div>
 
         <div id="editorArea" class="editorarea">
-            <div class="input-group">
-
-                <input class="editorinput" type="text" id="author" placeholder="输入作者姓名" value="axun"
-                    style="display: none;">
-                <input class="editorinput" type="text" id="title" placeholder="输入评论标题" value="untitled">
-            </div>
             <div class="star-container" id="star-container">
                 <span class="star-icon">☆</span>
                 <span class="star-icon">☆</span>
@@ -963,9 +961,15 @@
                 <span class="star-icon">☆</span>
             </div>
             <div class="input-group">
-                <div id="contentpreview"></div>
-                <textarea id="content" placeholder="输入评论内容"></textarea>
-                <textarea id="contentcode" placeholder="输入代码内容"></textarea>
+                <input class="editorinput" type="text" id="author" placeholder="输入作者姓名" value="axun"
+                    style="display: none;">
+                <input class="editorinput" type="text" id="title" placeholder="输入评论标题" value="untitled">
+            </div>
+
+            <div class="input-group">
+                <div id="contentpreview" style="display: none;"></div>
+                <textarea id="content" placeholder="输入评论内容,支持markdown"></textarea>
+                <textarea id="contentcode" placeholder="输入纯文本内容" style="display: none;"></textarea>
                 <input class="editorinput" type="text" id="tag" placeholder="输入标签,逗号(,)隔开">
                 <input class="editorinput" type="text" id="star" placeholder="星标等级1~10" value="1" pattern="[0-9]*"
                     title="请输入数字" style="display: none;">
@@ -975,11 +979,14 @@
 
             <div class="editorbtn-group">
                 <button class="editorareabtn" id="helpBtn">帮助</button>
+                <button class="editorareabtn tab-nav" id="preview-tab" onclick="switchToPreview()">预览</button>
+                <button class="editorareabtn tab-nav" id="edit-tab" class="selected" onclick="switchToEdit()">编辑</button>
+                <button class="editorareabtn tab-nav" id="plaintxt-tab" onclick="switchToPlaintext()">纯文本</button>
                 <button class="editorareabtn" id="clearBtn">清空</button>
                 <button class="editorareabtn" id="insertimgsBtn">图片</button>
                 <button class="editorareabtn" id="insertCodeBtn" style="display: none;">插入代码</button>
-                <button class="editorareabtn" id="exportBtn">导出到json</button>
-                <button class="editorareabtn" id="exportAllCommentsToHtmlBtn">导出到html</button>
+                <button class="editorareabtn" id="exportBtn">ToJson</button>
+                <button class="editorareabtn" id="exportAllCommentsToHtmlBtn">ToHtml</button>
                 <button class="editorareabtn" id="sendBtn">发送</button>
             </div>
 
@@ -1025,7 +1032,7 @@
             <div class="input-section">
                 <input type="text" id="local-image-names" placeholder="本地图片名称，逗号分隔"></input>
                 <button class="editorareabtn" id="local-images-btn">
-                    本地图片
+                    打开
                 </button>
                 <input type="file" id="local-images-input" multiple accept="image/*,.jpg,.jpeg,.png,.gif,.bmp,.tiff"
                     style="display: none;">
@@ -1037,9 +1044,9 @@
             <div class="preview-section" id="preview-container"></div>
             <div class="input-section">
                 <input type="text" id="image-base64" placeholder="图片Base64编码">
-                <button class="editorareabtn" id="confirm-btn">插入图片</button>
+                <button class="editorareabtn" id="confirm-btn">插入</button>
             </div>
-         
+
 
         </div>
 
@@ -1370,7 +1377,6 @@
                         tagContainer.style.display = 'block';
                         commentDiv.style.width = '';
 
-
                         const actionDivs = document.querySelectorAll('.action');
                         actionDivs.forEach(div => {
                             div.style.marginBottom = '-2em';
@@ -1616,6 +1622,49 @@
         hideButtons();
     </script>
     <script>
+
+        function switchToEdit() {
+            try {
+            document.getElementById('edit-tab').classList.add('selected');
+            document.getElementById('preview-tab').classList.remove('selected');
+            document.getElementById('plaintext-tab').classList.remove('selected');
+            }
+            catch (error) {
+                console.log('Error: ');
+            }
+            document.getElementById('content').style.display = 'block';
+            document.getElementById('contentpreview').style.display = 'none';
+            document.getElementById('contentcode').style.display = 'none';
+        }
+
+        function switchToPreview() {
+            try {
+            document.getElementById('preview-tab').classList.add('selected');
+            document.getElementById('edit-tab').classList.remove('selected');
+            document.getElementById('plaintext-tab').classList.remove('selected');
+        }
+            catch (error) {
+                console.log('Error: ');
+            }
+            document.getElementById('contentpreview').style.display = 'block';
+            document.getElementById('content').style.display = 'none';
+            document.getElementById('contentcode').style.display = 'none';
+        }
+
+        function switchToPlaintext() {
+            try {
+            document.getElementById('plaintxt-tab').classList.add('selected');
+            document.getElementById('edit-tab').classList.remove('selected');
+            document.getElementById('preview-tab').classList.remove('selected');
+        }
+            catch (error) {
+                console.log('Error: ');
+            }
+            document.getElementById('contentpreview').style.display = 'none';
+            document.getElementById('content').style.display = 'none';
+            document.getElementById('contentcode').style.display = 'block';
+        }
+
 
         function convertToTagList() {
             const inputElement = document.getElementById('tag');
@@ -2117,7 +2166,7 @@
                     allLocaBase64Images.forEach(base64Data => {
                         if (base64Data) {
                             addImageToPreview(base64Data);
-                            imageBase64.value += '\n'+ base64Data + ',';
+                            imageBase64.value += '\n' + base64Data + ',';
                         }
                     });
                 } catch (error) {
@@ -2234,6 +2283,7 @@
                 });
                 imageBase64Input.value = newEditorContent;
                 insertTextContentToTextarea("content", newEditorContent);
+                updatePreview();
                 modal.style.display = 'none';
                 // 清空预览区
                 previewContainer.innerHTML = '';
